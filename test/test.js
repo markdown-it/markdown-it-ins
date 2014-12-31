@@ -6,7 +6,7 @@ var generate = require('markdown-it-testgen');
 
 /*eslint-env mocha*/
 
-describe('markdown-it', function () {
+describe('markdown-it-ins', function () {
   var md = require('markdown-it')()
               .use(require('../'));
 

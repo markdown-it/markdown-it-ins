@@ -103,6 +103,12 @@ function insert(state, silent) {
 }
 
 
-module.exports = function for_inline_plugin(md) {
+function ins_open()  { return '<ins>'; }
+function ins_close() { return '</ins>'; }
+
+
+module.exports = function ins_plugin(md) {
   md.inline.ruler.before('emphasis', 'ins', insert);
+  md.renderer.rules.ins_open = ins_open;
+  md.renderer.rules.ins_close = ins_close;
 };
