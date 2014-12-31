@@ -46,9 +46,11 @@ function insert(state, silent) {
 
   res = scanDelims(state, start);
   startCount = res.delims;
+
   if (!res.can_open) {
     state.pos += startCount;
-    if (!silent) { state.pending += state.src.slice(start, state.pos); }
+    // Earlier we shecked !silent, but this implementation does not need it
+    state.pending += state.src.slice(start, state.pos);
     return true;
   }
 
@@ -90,11 +92,10 @@ function insert(state, silent) {
   state.posMax = state.pos;
   state.pos = start + 2;
 
-  if (!silent) {
-    state.push({ type: 'ins_open', level: state.level++ });
-    state.md.inline.tokenize(state);
-    state.push({ type: 'ins_close', level: --state.level });
-  }
+  // Earlier we shecked !silent, but this implementation does not need it
+  state.push({ type: 'ins_open', level: state.level++ });
+  state.md.inline.tokenize(state);
+  state.push({ type: 'ins_close', level: --state.level });
 
   state.pos = state.posMax + 2;
   state.posMax = max;
