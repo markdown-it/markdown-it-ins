@@ -49,7 +49,7 @@ function insert(state, silent) {
 
   if (!res.can_open) {
     state.pos += startCount;
-    // Earlier we shecked !silent, but this implementation does not need it
+    // Earlier we checked !silent, but this implementation does not need it
     state.pending += state.src.slice(start, state.pos);
     return true;
   }
@@ -92,7 +92,7 @@ function insert(state, silent) {
   state.posMax = state.pos;
   state.pos = start + 2;
 
-  // Earlier we shecked !silent, but this implementation does not need it
+  // Earlier we checked !silent, but this implementation does not need it
   state.push({ type: 'ins_open', level: state.level++ });
   state.md.inline.tokenize(state);
   state.push({ type: 'ins_close', level: --state.level });
