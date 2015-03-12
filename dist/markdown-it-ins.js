@@ -1,4 +1,4 @@
-/*! markdown-it-ins 0.1.0 https://github.com//markdown-it/markdown-it-ins @license MIT */!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var n;"undefined"!=typeof window?n=window:"undefined"!=typeof global?n=global:"undefined"!=typeof self&&(n=self),n.markdownitIns=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*! markdown-it-ins 1.0.0 https://github.com//markdown-it/markdown-it-ins @license MIT */(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.markdownitIns = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
 
@@ -6,22 +6,51 @@
 // "start" should point at a valid marker
 function scanDelims(state, start) {
   var pos = start, lastChar, nextChar, count,
+      isLastWhiteSpace, isLastPunctChar,
+      isNextWhiteSpace, isNextPunctChar,
       can_open = true,
       can_close = true,
       max = state.posMax,
-      marker = state.src.charCodeAt(start);
+      marker = state.src.charCodeAt(start),
+      isWhiteSpace = state.md.utils.isWhiteSpace,
+      isPunctChar = state.md.utils.isPunctChar,
+      isMdAsciiPunct = state.md.utils.isMdAsciiPunct;
 
-  lastChar = start > 0 ? state.src.charCodeAt(start - 1) : -1;
+  // treat beginning of the line as a whitespace
+  lastChar = start > 0 ? state.src.charCodeAt(start - 1) : 0x20;
 
   while (pos < max && state.src.charCodeAt(pos) === marker) { pos++; }
-  if (pos >= max) { can_open = false; }
+
+  if (pos >= max) {
+    can_open = false;
+  }
+
   count = pos - start;
 
-  nextChar = pos < max ? state.src.charCodeAt(pos) : -1;
+  // treat end of the line as a whitespace
+  nextChar = pos < max ? state.src.charCodeAt(pos) : 0x20;
 
-  // check whitespace conditions
-  if (nextChar === 0x20 || nextChar === 0x0A) { can_open = false; }
-  if (lastChar === 0x20 || lastChar === 0x0A) { can_close = false; }
+  isLastPunctChar = isMdAsciiPunct(lastChar) || isPunctChar(String.fromCharCode(lastChar));
+  isNextPunctChar = isMdAsciiPunct(nextChar) || isPunctChar(String.fromCharCode(nextChar));
+
+  isLastWhiteSpace = isWhiteSpace(lastChar);
+  isNextWhiteSpace = isWhiteSpace(nextChar);
+
+  if (isNextWhiteSpace) {
+    can_open = false;
+  } else if (isNextPunctChar) {
+    if (!(isLastWhiteSpace || isLastPunctChar)) {
+      can_open = false;
+    }
+  }
+
+  if (isLastWhiteSpace) {
+    can_close = false;
+  } else if (isLastPunctChar) {
+    if (!(isNextWhiteSpace || isNextPunctChar)) {
+      can_close = false;
+    }
+  }
 
   return {
     can_open: can_open,
@@ -38,6 +67,7 @@ function insert(state, silent) {
       found,
       stack,
       res,
+      token,
       max = state.posMax,
       start = state.pos,
       marker = state.src.charCodeAt(start);
@@ -94,9 +124,13 @@ function insert(state, silent) {
   state.pos = start + 2;
 
   // Earlier we checked !silent, but this implementation does not need it
-  state.push({ type: 'ins_open', level: state.level++ });
+  token        = state.push('ins_open', 'ins', 1);
+  token.markup = String.fromCharCode(marker) + String.fromCharCode(marker);
+
   state.md.inline.tokenize(state);
-  state.push({ type: 'ins_close', level: --state.level });
+
+  token        = state.push('ins_close', 'ins', -1);
+  token.markup = String.fromCharCode(marker) + String.fromCharCode(marker);
 
   state.pos = state.posMax + 2;
   state.posMax = max;
@@ -104,14 +138,8 @@ function insert(state, silent) {
 }
 
 
-function ins_open()  { return '<ins>'; }
-function ins_close() { return '</ins>'; }
-
-
 module.exports = function ins_plugin(md) {
   md.inline.ruler.before('emphasis', 'ins', insert);
-  md.renderer.rules.ins_open = ins_open;
-  md.renderer.rules.ins_close = ins_close;
 };
 
 },{}]},{},[1])(1)
