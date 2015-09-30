@@ -26,7 +26,7 @@ x ++++foo++++
 .
 x +++foo+++
 .
-<p>x <ins>+foo+</ins></p>
+<p>x +<ins>foo</ins>+</p>
 .
 
 
@@ -107,6 +107,17 @@ test++</p>
 test
 ++</p>
 .
+
+
+.
+x ++a ++foo+++++++++++bar++ b++
+
+x ++a ++foo++++++++++++bar++ b++
+.
+<p>x <ins>a <ins>foo</ins></ins>+++<ins><ins>bar</ins> b</ins></p>
+<p>x <ins>a <ins>foo</ins></ins>++++<ins><ins>bar</ins> b</ins></p>
+.
+
 
 From CommonMark test suite, replacing `**` with our marker:
 
