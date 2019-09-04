@@ -126,3 +126,11 @@ a++"foo"++
 .
 <p>a++&quot;foo&quot;++</p>
 .
+
+
+Should parse delimiters inside links:
+.
+[++foo++]()
+.
+<p><a href=""><ins>foo</ins></a></p>
+.
