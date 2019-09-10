@@ -1,3 +1,9 @@
+3.0.0 / 2019-09-11
+------------------
+
+- Markdown-it 5.0.0 support + related fixes in pairs parse.
+- uglify-js => terser.
+
 2.0.0 / 2015-10-05
 ------------------
 
