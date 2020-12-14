@@ -134,3 +134,11 @@ Should parse delimiters inside links:
 .
 <p><a href=""><ins>foo</ins></a></p>
 .
+
+
+Regression test for markdown-it/markdown-it#742:
+.
+-++++;++++++
+.
+<p>-<ins><ins>;</ins></ins>++</p>
+.
