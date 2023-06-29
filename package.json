@@ -9,7 +9,7 @@
     "insert",
     "ins"
   ],
-  "repository": "markdown-it/markdown-it-mark",
+  "repository": "markdown-it/markdown-it-ins",
   "license": "MIT",
   "files": [
     "index.js",
